@@ -1,0 +1,7 @@
+test_job:
+  stage: test
+  image: node:18-slim
+  script:
+    - npm install
+    # Pointing to the new src directory
+    - npx eslint src/*.js || true

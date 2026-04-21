@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Radio stations server</title>
+        <style>
+            :root {
+                --bg: #0f172a;
+                --card: #1e293b;
+                --accent: #38bdf8;
+                --text: #f8fafc;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem;
+            }
+
+            .container {
+                max-width: 800px;
+                width: 100%;
+            }
+
+            .station-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+                margin-top: 2rem;
+            }
+
+            .card {
+                background: var(--card);
+                border-radius: 12px;
+                padding: 1.5rem;
+                text-align: center;
+                transition: transform 0.2s;
+                border: 1px solid #334155;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                border-color: var(--accent);
+            }
+
+            .card img {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                margin-bottom: 1rem;
+                object-fit: cover;
+            }
+
+            .play-btn {
+                background: var(--accent);
+                color: var(--bg);
+                border: none;
+                padding: 0.5rem 1.5rem;
+                border-radius: 20px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            .player-bar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #1e293b;
+                padding: 1rem;
+                border-top: 2px solid var(--accent);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+
+            audio {
+                filter: invert(100%);
+                width: 100%;
+                max-width: 400px;
+            }
+
+            #status {
+                margin-bottom: 0.5rem;
+                font-size: 0.9rem;
+                color: var(--accent);
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+            <div id="station-list" class="station-grid"></div>
+        </div>
+
+        <div class="player-bar">
+            <div id="status">Select a station to start listening</div>
+            <audio id="audio-player" controls></audio>
+        </div>
+
+        <script>
+            // Configuration - Match these to your server.js
+            const AUTH = 'Basic ' + btoa('admin:radio-pass-2026');
+            const API_URL = 'http://localhost:4123';
+
+            async function loadStations() {
+                try {
+                    const res = await fetch(API_URL + '/api/stations', { headers: { 'Authorization': AUTH } });
+                    const stations = await res.json();
+                    const grid = document.getElementById('station-list');
+
+                    grid.innerHTML = stations.map(s => `
+                        <div class="card">
+                            <img src="${API_URL}${s.imageUrl}" alt="${s.name}" />
+                            <h3>${s.name}</h3>
+                            <p style="font-size: 0.8rem; color: #94a3b8;">${s.description}</p>
+                            <button class="play-btn" onclick="playStream('${s.id}', '${s.name}')">Play</button>
+                        </div>
+                    `).join('');
+                } catch (err) {
+                    console.error("Failed to load stations", err);
+                }
+            }
+
+             async function getStationDetails(id) {
+                    try {
+                    const res = await fetch(`${API_URL}/api/stations/${id}/`, { headers: { 'Authorization': AUTH } });
+                    const stationDetails = await res.json();
+
+                    console.log("Station Details:", stationDetails);
+                    return stationDetails;
+                } catch (err) {
+                    console.error("Failed to load station details", err);
+                }
+            }
+
+            function playStream(id, name) {
+                const player = document.getElementById('audio-player');
+                const status = document.getElementById('status');
+
+                getStationDetails(id);
+
+                // We point the source to our conversion route
+                player.src = `${API_URL}/api/stations/${id}/stream?auth=${encodeURIComponent(AUTH)}`;
+                status.innerText = `Currently Playing: ${name}`;
+                player.play();
+            }
+
+            loadStations();
+        </script>
+
+    </body>
+
+</html>

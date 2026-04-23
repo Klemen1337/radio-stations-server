@@ -94,7 +94,7 @@ app.get('/api/stations/:id/stream', (req, res) => {
   req.on('close', () => {
     if (activeStreams[station.id]) activeStreams[station.id].listenerCount--;
     // Cleanup: If no one is listening, kill the FFmpeg process to save memory
-    if (activeStreams[station.id].listenerCount <= 0) {
+    if (activeStreams[station.id] && activeStreams[station.id].listenerCount <= 0) {
       console.log(`[Optimization] Idle station ${station.id}. Killing process.`);
       activeStreams[station.id].command.kill('SIGKILL');
       delete activeStreams[station.id];

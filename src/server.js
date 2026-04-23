@@ -13,13 +13,13 @@ const PORT = process.env.PORT || 4123;
 app.use(cors());
 
 // 1. Basic Auth
-app.use(basicAuth({
-  users: {
-    'kemi': 'kemi',
-    'admin': 'radio-pass-2026'
-  },
-  challenge: true,
-}));
+// app.use(basicAuth({
+//   users: {
+//     'kemi': 'kemi',
+//     'admin': 'radio-pass-2026'
+//   },
+//   challenge: true,
+// }));
 
 // 2. Data (Simplified for brevity)
 const radioStations = require('./stations.js').stations;

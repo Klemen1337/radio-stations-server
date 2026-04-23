@@ -1,5 +1,7 @@
+version: '2.1'
+
 services:
-  app:
+  radio-stations-server:
     build: .
     container_name: radio-stations-server
     ports:

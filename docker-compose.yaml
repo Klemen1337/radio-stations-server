@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: radio-stations-server
+    ports:
+      - "4123:4123"
+    environment:
+      - NODE_ENV=production
+    restart: always

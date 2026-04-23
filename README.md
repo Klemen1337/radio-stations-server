@@ -23,4 +23,10 @@ A Node.js powered service that manages a list of radio stations, serves images, 
 
 ```bash
 npm install
+npm run serve
+```
+
+```bash
+docker build . --file Dockerfile --tag radio-stations-server
+docker compose up -d
 ```
